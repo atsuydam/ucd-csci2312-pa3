@@ -1,7 +1,7 @@
 // File: Cluster.h
 //
 // Created by Ivo Georgiev on 9/14/15.
-//
+
 
 #ifndef CLUSTERING_CLUSTER_H
 #define CLUSTERING_CLUSTER_H

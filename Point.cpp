@@ -12,7 +12,7 @@ namespace Clustering {
 
     unsigned int Point::__idGen = 0; // ID generator
 
-    static void rewindIdGen()
+    static void Point:: rewindIdGen()
     {
 
     }

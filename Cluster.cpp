@@ -8,10 +8,66 @@ using namespace std;
 
 
 namespace Clustering {
+    LNode::LNode(const Point &p, LNodePtr n)
+            :point(p)
+    {
+
+    }
+
+    Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
+            : __p(0), __c(c)
+    {
+        unsigned int __dimensions = d;
+        Point __p = 0;
+        bool __valid = true;
+        const Cluster &__c = c;
+    }
+
+    const Cluster::Centroid::Point get() const // doesn't check for validity
+    {
+
+    }
+
+    void Cluster::Centroid::set(const Clustering::Point &p) // sets to valid
+    {
+
+    }
+
+    bool Cluster::Centroid::isValid() const
+    {
+
+    }
+
+    void Cluster::Centroid::setValid(bool valid)
+    {
+
+    }
+
+    void Cluster::Centroid::compute()
+    {
+
+    }
+
+    bool Cluster::Centroid::equal(const Point &) const
+    {
+
+    }
+
+    void Cluster::Centroid::toInfinity()
+    {
+
+    }
+
+    Cluster::Cluster(unsigned int d)
+            :centroid(__dimensionality, *this)
+    {
+
+    }
     // The big three: cpy ctor, overloaded operator=, dtor
     Cluster::Cluster(const Cluster &rhs)
-            : __size(rhs.__size)
+            : centroid(__dimensionality, *this)
     {
+        __size = rhs.__size;
         if (__points != NULL)
             __del();
         LNodePtr cursor = rhs.__points;
@@ -103,6 +159,16 @@ namespace Clustering {
     unsigned int Cluster::getSize() const // TODO add to the requirements
     {
         return __size;
+    }
+
+    unsigned int Cluster::getDimensionality() const
+    {
+
+    }
+
+    unsigned int Cluster::getId() const
+    {
+
     }
 
 // Set functions: They allow calling c1.add(c2.remove(p));
@@ -198,7 +264,7 @@ namespace Clustering {
         return p;
     }
 
-    bool Cluster:: contains(const Point &theWantedOne) // I'm getting tired of p
+    bool Cluster:: contains(const Point &theWantedOne) const // I'm getting tired of p
     {
         bool answer = false;
         LNodePtr cursor = __points;
@@ -213,6 +279,10 @@ namespace Clustering {
 
     }
 
+    void Cluster::pickCentroids(unsigned int k, Point **pointArray)
+    {
+
+    }
 // Overloaded operators
 
 // Members: Subscript
@@ -339,32 +409,43 @@ namespace Clustering {
 // Friends: Arithmetic (Cluster and Point)
     const Cluster operator+(const Cluster &c, const Point &p)
     {
-        Cluster added;
-        added.__cpy(c.__points);
-        added.add(p);
-        return added;
+//        Cluster added;
+//        added.__cpy(c.__points);
+//        added.add(p);
+//        return added;
     }
 
     const Cluster operator-(const Cluster &c, const Point &p)
     {
-        Cluster subtracted;
-        subtracted.__cpy(c.__points);
-        subtracted.remove(p);
-        return subtracted;
+//        Cluster subtracted;
+//        subtracted.__cpy(c.__points);
+//        subtracted.remove(p);
+//        return subtracted;
     }
 
 // Friends: Arithmetic (two Clusters)
     const Cluster operator+(const Cluster &one, const Cluster &two) // union
     {
-        Cluster allTogether;
-        allTogether.__cpy(one.__points);
-        int size = two.getSize();
-        // This isn't going to work, it will pass the first point and nothing more.
-        allTogether.add(two.__points->point);
+//        Cluster allTogether;
+//        allTogether.__cpy(one.__points);
+//        int size = two.getSize();
+//        // This isn't going to work, it will pass the first point and nothing more.
+//        allTogether.add(two.__points->point);
 
     }
 
     const Cluster operator-(const Cluster &, const Cluster &) // (asymmetric) difference
+    {
+
+    }
+
+    Cluster::Move::Move(const Point &p, Cluster &from, Cluster &to)
+            : __p(p), __from(from), __to(to)
+    {
+
+    }
+
+    void Cluster::Move::perform()
     {
 
     }
