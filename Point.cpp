@@ -12,7 +12,9 @@ namespace Clustering {
 
     unsigned int Point::__idGen = 0; // ID generator
 
-    static void Point:: rewindIdGen()
+    static const char Point:: POINT_VALUE_DELIM = ',';
+
+    void Point:: rewindIdGen()
     {
 
     }

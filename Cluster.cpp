@@ -23,7 +23,7 @@ namespace Clustering {
         const Cluster &__c = c;
     }
 
-    const Cluster::Centroid::Point get() const // doesn't check for validity
+    const Point Cluster::Centroid::get() const // doesn't check for validity
     {
 
     }
@@ -264,7 +264,7 @@ namespace Clustering {
         return p;
     }
 
-    bool Cluster:: contains(const Point &theWantedOne) const // I'm getting tired of p
+    bool Cluster::contains(const Point &theWantedOne) const // I'm getting tired of p
     {
         bool answer = false;
         LNodePtr cursor = __points;
