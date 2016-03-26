@@ -4,6 +4,7 @@
 #include <fstream>
 #include "Point.h"
 #include "Cluster.h"
+#include "Exceptions.h"
 
 using namespace std;
 
@@ -12,15 +13,17 @@ namespace Clustering {
 
     unsigned int Point::__idGen = 0; // ID generator
 
-    static const char Point:: POINT_VALUE_DELIM = ',';
+    const char Point:: POINT_VALUE_DELIM = ',';
 
     void Point:: rewindIdGen()
     {
-
+        __idGen--;
     }
 
     Point::Point(unsigned int size)
     {
+        if (size <= 0)
+            throw ZeroDimensionsEx();
         __id = __idGen++;
         __dim = size;
         __values = new double[size];
@@ -51,6 +54,8 @@ namespace Clustering {
     Point &Point::operator=(const Point &rhs)
     {
         __id = __idGen++;
+        if (__dim > rhs.__dim)
+            throw DimensionalityMismatchEx(__dim, rhs.__dim);
         if (this == &rhs)
         {
             return *this;
@@ -84,11 +89,15 @@ namespace Clustering {
 
     void Point::setValue(unsigned int i, double num)
     {
+        if (i >= __dim || i < 0)
+            throw OutOfBoundsEx(i, __dim);
         __values[i] = num;
     }
 
     double Point::getValue(unsigned int i) const
     {
+        if (i >= __dim || i < 0)
+            throw OutOfBoundsEx(i, __dim);
         return __values[i];
     }
 
@@ -162,11 +171,15 @@ namespace Clustering {
 
     double &Point::operator[](unsigned int index)
     {
+        if (index >= __dim)
+            throw OutOfBoundsEx(index, __dim);
         return __values[index];
     }
 
     const double &Point::operator[](unsigned int index) const
     {
+        if (index >= __dim)
+            throw OutOfBoundsEx(index, __dim);
         return __values[index];
     }
 

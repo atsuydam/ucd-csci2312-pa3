@@ -34,15 +34,15 @@ int main() {
     // point tests
     test_point_smoketest(ec);
     test_point_id(ec, NumIters);
-//    test_point_getsetelem(ec, NumIters);
+    test_point_getsetelem(ec, NumIters);
     test_point_copying(ec, NumIters);
     test_point_assignment(ec, NumIters);
     test_point_equality(ec, NumIters);
     test_point_comparison(ec, NumIters);
-    test_point_CAO(ec, NumIters);
-    test_point_SAO(ec, NumIters);
-    test_point_distance(ec, NumIters);
-    test_point_IO(ec, NumIters);
+//    test_point_CAO(ec, NumIters);
+//    test_point_SAO(ec, NumIters);
+//    test_point_distance(ec, NumIters);
+//    test_point_IO(ec, NumIters);
 
     // cluster tests
 //    test_cluster_smoketest(ec);

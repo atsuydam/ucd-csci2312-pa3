@@ -8,22 +8,24 @@ namespace Clustering{
     // Out of Bounds Exceptions
     OutOfBoundsEx::OutOfBoundsEx(unsigned int c, int r)
     {
-
+        __current = c;
+        __rhs = r;
+        __name = "OutOfBoundsEx";
     }
 
     unsigned int OutOfBoundsEx::getCurrent() const
     {
-
+        return __current;
     }
 
     int OutOfBoundsEx::getRhs() const
     {
-
+        return __rhs;
     }
 
     std::string OutOfBoundsEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const OutOfBoundsEx &ex)
@@ -34,22 +36,24 @@ namespace Clustering{
     // Dimensionality exceptions
     DimensionalityMismatchEx::DimensionalityMismatchEx(unsigned int c, unsigned int r)
     {
-
+        __current = c;
+        __rhs = r;
+        __name = "DimensionalityMismatchEx";
     }
 
     unsigned int DimensionalityMismatchEx::getCurrent() const
     {
-
+        return __current;
     }
 
     unsigned int DimensionalityMismatchEx::getRhs() const
     {
-
+        return __rhs;
     }
 
     std::string DimensionalityMismatchEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const DimensionalityMismatchEx &ex)
@@ -97,12 +101,12 @@ namespace Clustering{
     //zero Dimensions Exceptions
     ZeroDimensionsEx::ZeroDimensionsEx()
     {
-
+        __name = "ZeroDimensionsEx";
     }
 
     std::string ZeroDimensionsEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const ZeroDimensionsEx &ex)
