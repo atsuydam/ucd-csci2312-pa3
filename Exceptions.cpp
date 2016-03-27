@@ -30,7 +30,8 @@ namespace Clustering{
 
     std::ostream &operator<<(std::ostream &os, const OutOfBoundsEx &ex)
     {
-
+        os << "Current side of " << ex.__current << " is out of bounds of the size " << ex.__rhs << std::endl;
+        return os;
     }
 
     // Dimensionality exceptions
@@ -58,7 +59,8 @@ namespace Clustering{
 
     std::ostream &operator<<(std::ostream &os, const DimensionalityMismatchEx &ex)
     {
-
+        os << "Current size of " << ex.__current << " doesn't match the other side of " << ex.__rhs << std::endl;
+        return os;
     }
 
     //Zero Clusters Exceptions
@@ -111,7 +113,8 @@ namespace Clustering{
 
     std::ostream &operator<<(std::ostream &os, const ZeroDimensionsEx &ex)
     {
-
+        os << "The current cluster has no dimensions" << std::endl;
+        return os;
     }
 
     //Empty Cluster Exceptions

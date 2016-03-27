@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cassert>
 #include "Cluster.h"
+#include "Exceptions.h"
 #include "Point.h"
 
 using namespace std;
@@ -11,14 +12,17 @@ namespace Clustering {
     LNode::LNode(const Point &p, LNodePtr n)
             :point(p)
     {
-
+        Point point = p;
+        LNodePtr next = n;
     }
 
     Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
             : __p(d), __c(c)
     {
         unsigned int __dimensions = d;
+        Point __p = 0;
         bool __valid = true;
+        const Cluster &__c = c;
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
@@ -57,9 +61,11 @@ namespace Clustering {
     }
 
     Cluster::Cluster(unsigned int d)
-            :centroid(__dimensionality, *this)
+            :centroid(d, *this)
     {
-
+        __dimensionality = d;
+        __size = d;
+        __points = 0;
     }
     // The big three: cpy ctor, overloaded operator=, dtor
     Cluster::Cluster(const Cluster &rhs)

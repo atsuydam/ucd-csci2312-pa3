@@ -105,6 +105,8 @@ namespace Clustering {
 // Functions
     double Point::distanceTo(const Point &rhs) const
     {
+        if (__dim != rhs.__dim)
+            throw DimensionalityMismatchEx(__dim, rhs.__dim);
         double distance = 0;
         double squared;
         int size;
@@ -187,6 +189,8 @@ namespace Clustering {
 // Friends
     Point &operator+=(Point &lhs, const Point &rhs)
     {
+        if (lhs.__dim != rhs.__dim)
+            throw DimensionalityMismatchEx(lhs.__dim, rhs.__dim);
         for (int i=0; i <rhs.__dim; i++)
         {
             lhs.__values[i] += rhs.__values[i];
@@ -196,6 +200,8 @@ namespace Clustering {
 
     Point &operator-=(Point &lhs, const Point &rhs)
     {
+        if (lhs.__dim != rhs.__dim)
+            throw DimensionalityMismatchEx(lhs.__dim, rhs.__dim);
         int size = lhs.__dim;
         for (int i=0; i < size; i++)
         {
@@ -206,6 +212,8 @@ namespace Clustering {
 
     const Point operator+(const Point &lhs, const Point &rhs)
     {
+        if (lhs.__dim != rhs.__dim)
+            throw DimensionalityMismatchEx(lhs.__dim, rhs.__dim);
         int size = (lhs.__dim + rhs.__dim);
         Point p(size);
         for (int i=0; i < size; i++)
@@ -217,6 +225,8 @@ namespace Clustering {
 
     const Point operator-(const Point &lhs, const Point &rhs)
     {
+        if (lhs.__dim != rhs.__dim)
+            throw DimensionalityMismatchEx(lhs.__dim, rhs.__dim);
         int size = (lhs.__dim + rhs.__dim);
         Point p(size);
         for (int i=0; i < size; i++)
