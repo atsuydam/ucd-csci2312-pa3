@@ -2,6 +2,7 @@
 #include <sstream>
 #include <cmath>
 #include <fstream>
+#include <bits/stl_algo.h>
 #include "Point.h"
 #include "Cluster.h"
 #include "Exceptions.h"
@@ -267,7 +268,9 @@ namespace Clustering {
     bool operator<(const Point &lhs, const Point &rhs)
     {
         bool answer = false;
-        int size = lhs.__dim;
+        unsigned int size = lhs.__dim;
+        if (size < rhs.__dim || size > rhs.__dim)
+            throw DimensionalityMismatchEx(size, rhs.__dim);
         for (int i=0; i < size; i++)
         {
             if ( lhs.__values[i] < rhs.__values[i])
@@ -285,6 +288,8 @@ namespace Clustering {
     {
         bool answer = false;
         int size = lhs.__dim;
+        if (size < rhs.__dim || size > rhs.__dim)
+            throw DimensionalityMismatchEx(size, rhs.__dim);
         for (int i=0; i < size; i++)
         {
             if ( lhs.__values[i] > rhs.__values[i])
@@ -302,6 +307,8 @@ namespace Clustering {
     {
         bool answer = true;
         int size = lhs.__dim;
+        if (size < rhs.__dim || size > rhs.__dim)
+            throw DimensionalityMismatchEx(size, rhs.__dim);
         for (int i=0; i < size; i++)
         {
             if ( lhs.__values[i] > rhs.__values[i])
@@ -316,6 +323,8 @@ namespace Clustering {
     {
         bool answer = true;
         int size = lhs.__dim;
+        if (size < rhs.__dim || size > rhs.__dim)
+            throw DimensionalityMismatchEx(size, rhs.__dim);
         for (int i=0; i < size; i++)
         {
             if ( lhs.__values[i] < rhs.__values[i])
@@ -330,9 +339,10 @@ namespace Clustering {
     std::ostream &operator<<(std::ostream &os, const Point &p)
     {
         int i=0;
-        for (; i > p.__dim-1; i++ )
+        for (int index = 0; index < p.__dim-1; index++ )
         {
-            os << p.__values[i] << ", ";
+            os << p.__values[i] << p.POINT_VALUE_DELIM;
+            i++;
         }
         os << p.__values[i] << endl;
         return os;
@@ -340,11 +350,22 @@ namespace Clustering {
 
     std::istream &operator>>(std::istream &is, Point &p)
     {
-        int i=0;
-        for (; i > p.__dim; i++)
+        double d;
+        unsigned int count = 0;
+        string value;
+        unsigned int i = 0;
+
+        while (getline(is, value, p.POINT_VALUE_DELIM))
         {
-            is >> p.__values[i];
+            d = stod(value);
+            if ( i < p.__dim)
+            {
+                p.setValue(i++, d);
+            }
+            count++;
         }
+       if (count != p.__dim)
+           throw DimensionalityMismatchEx(i, p.__dim);
         return is;
     }
 }

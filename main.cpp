@@ -42,10 +42,10 @@ int main() {
 //    test_point_CAO(ec, NumIters);
 //    test_point_SAO(ec, NumIters);
 //    test_point_distance(ec, NumIters);
-//    test_point_IO(ec, NumIters);
+    test_point_IO(ec, NumIters);
 
     // cluster tests
-//    test_cluster_smoketest(ec);
+    test_cluster_smoketest(ec);
 //    test_cluster_subscript(ec, NumIters);
 //    test_cluster_equality(ec, NumIters);
 //    test_cluster_order(ec, NumIters);

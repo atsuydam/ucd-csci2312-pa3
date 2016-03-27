@@ -1131,10 +1131,14 @@ void test_point_IO(ErrorContext &ec, unsigned int numRuns) {
             Point p1(50);
 
             for (int i = 0; i < 50; i++)
+            {
                 p1[i] = 6.12 * i * i + 5.17 * i + 4.19;
+               // std::cout << "Sending variable to output:  " << p1[i] << ", for i =" << i << std::endl;
+            }
 
             Point p2(50);
             std::stringstream iostr;
+
             iostr << std::setprecision(20) << p1; // Avoid truncation
             iostr >> p2;
 

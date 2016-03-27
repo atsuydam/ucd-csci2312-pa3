@@ -15,12 +15,10 @@ namespace Clustering {
     }
 
     Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
-            : __p(0), __c(c)
+            : __p(d), __c(c)
     {
         unsigned int __dimensions = d;
-        Point __p = 0;
         bool __valid = true;
-        const Cluster &__c = c;
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
