@@ -9,6 +9,8 @@ using namespace std;
 
 
 namespace Clustering {
+    unsigned int __idGenerator = 0;
+
     LNode::LNode(const Point &p, LNodePtr n)
             :point(p)
     {
@@ -19,30 +21,30 @@ namespace Clustering {
     Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
             : __p(d), __c(c)
     {
-        unsigned int __dimensions = d;
-        Point __p = 0;
-        bool __valid = true;
-        const Cluster &__c = c;
+        unsigned int __dimensions = d;  // how many dimensions the centroid point needs to occupy, 2, 3, 50 etc
+        bool __valid = false;
+        const Cluster &__c = c;     // the cluster of points passed to the centroid
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
     {
-
+        return __p;
     }
 
     void Cluster::Centroid::set(const Clustering::Point &p) // sets to valid
     {
-
+        __p = p;
+        __valid = true;
     }
 
     bool Cluster::Centroid::isValid() const
     {
-
+        return __valid;
     }
 
     void Cluster::Centroid::setValid(bool valid)
     {
-
+        __valid = valid;
     }
 
     void Cluster::Centroid::compute()
@@ -64,8 +66,8 @@ namespace Clustering {
             :centroid(d, *this)
     {
         __dimensionality = d;
-        __size = d;
-        __points = 0;
+        __size = 0;
+        __points = nullptr;
     }
     // The big three: cpy ctor, overloaded operator=, dtor
     Cluster::Cluster(const Cluster &rhs)
@@ -81,6 +83,7 @@ namespace Clustering {
         {
             this->add(cursor->point);
             cursor = cursor->next;
+            __size++;
         }
     }
 
@@ -108,6 +111,7 @@ namespace Clustering {
             add(rhsPtr->point);
             if (rhsPtr->next != NULL)
                 rhsPtr = rhsPtr->next;
+            __size++;
         }
         return *this;
     }
@@ -128,6 +132,7 @@ namespace Clustering {
                 nextPnt = nextPnt->next;
             }
         }
+        __size = 0;
     }
 
     void Cluster::__del()
@@ -151,6 +156,7 @@ namespace Clustering {
         {
             this->add(cursor->point);
             cursor = cursor->next;
+            __size++;
         }
     }
 
@@ -179,7 +185,7 @@ namespace Clustering {
     void Cluster::add(const Point &p) // TODO add asc order to the requirements
     {
         LNodePtr newPnt = new LNode(p, NULL);
-        LNodePtr cursor;
+        LNodePtr cursor = __points;
         LNodePtr prev;
         newPnt->point = p;
 
@@ -272,6 +278,8 @@ namespace Clustering {
     {
         bool answer = false;
         LNodePtr cursor = __points;
+        if (__dimensionality != theWantedOne.getDims())
+            throw DimensionalityMismatchEx(__dimensionality, theWantedOne.getDims());
 
         for (cursor = __points; cursor != NULL; cursor = cursor->next)
         {
@@ -294,11 +302,16 @@ namespace Clustering {
     {
         LNodePtr cursor = __points;
 
+        if (__size == 0)
+            throw EmptyClusterEx();
+        if (index >= __size)
+            throw OutOfBoundsEx(index, __size);
+
         if (cursor != NULL)
         {
             for (int i=0; i<index; i++)
             {
-                cursor = cursor->next;
+               cursor = cursor->next;
             }
         }
         return cursor->point;
@@ -349,11 +362,12 @@ namespace Clustering {
     {
         LNodePtr cursor = c.__points;
         int i=0;
-        for ( ; i<c.__size-1; i++)
+        for ( ; i < c.__size; i++)
         {
             out << cursor->point << " ";
             cursor = cursor->next;
         }
+        return out;
     }
 
     std::istream &operator>>(std::istream &in, Cluster &c)
@@ -364,7 +378,6 @@ namespace Clustering {
 // Friends: Comparison
     bool operator==(const Cluster &lhs, const Cluster &rhs)
     {
-        // Something is causing my comparisons to throw a segmentation error. So something is broken here
         bool answer = true;
         if (lhs.__size != rhs.__size)
             return false;
@@ -389,6 +402,10 @@ namespace Clustering {
     bool operator!=(const Cluster &lhs, const Cluster &rhs)
     {
         bool answer = false;
+
+        if (lhs.__dimensionality != rhs.__dimensionality)
+            throw DimensionalityMismatchEx(lhs.__dimensionality, rhs.__dimensionality);
+
         if (lhs.__size != rhs.__size)
         {
             answer = true;
@@ -404,7 +421,7 @@ namespace Clustering {
                 Rcursor = Rcursor->next;
                 Lcursor = Lcursor->next;
             }
-            if (Lcursor->point != Rcursor->point)
+            else if (Lcursor->point != Rcursor->point)
                 answer = true;
         }
         return answer;

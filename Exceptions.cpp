@@ -113,24 +113,25 @@ namespace Clustering{
 
     std::ostream &operator<<(std::ostream &os, const ZeroDimensionsEx &ex)
     {
-        os << "The current cluster has no dimensions" << std::endl;
+        os << "The current point has no dimensions" << std::endl;
         return os;
     }
 
     //Empty Cluster Exceptions
     EmptyClusterEx::EmptyClusterEx()
     {
-
+        __name = "EmptyClusterEx";
     }
 
     std::string EmptyClusterEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const EmptyClusterEx &ex)
     {
-
+        os << "The cluster contains no points" << std::endl;
+        return os;
     }
 
 }
