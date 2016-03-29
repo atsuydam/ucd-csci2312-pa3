@@ -31,7 +31,7 @@ int main() {
 
     ErrorContext ec(cout);
 
-    // point tests
+//    // point tests
     test_point_smoketest(ec);
     test_point_id(ec, NumIters);
     test_point_getsetelem(ec, NumIters);
@@ -44,11 +44,11 @@ int main() {
     test_point_distance(ec, NumIters);
     test_point_IO(ec, NumIters);
 
-    // cluster tests
+//    // cluster tests
     test_cluster_smoketest(ec);
     test_cluster_subscript(ec, NumIters);
     test_cluster_equality(ec, NumIters);
-//    test_cluster_order(ec, NumIters);
+    test_cluster_order(ec, NumIters);
     test_cluster_addremove(ec, NumIters);
     test_cluster_contain(ec, NumIters);
 //    test_cluster_move(ec, NumIters);

@@ -1133,7 +1133,6 @@ void test_point_IO(ErrorContext &ec, unsigned int numRuns) {
             for (int i = 0; i < 50; i++)
             {
                 p1[i] = 6.12 * i * i + 5.17 * i + 4.19;
-               // std::cout << "Sending variable to output:  " << p1[i] << ", for i =" << i << std::endl;
             }
 
             Point p2(50);

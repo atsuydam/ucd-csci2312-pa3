@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <limits>
 #include "Cluster.h"
 #include "Exceptions.h"
 #include "Point.h"
@@ -9,21 +10,22 @@ using namespace std;
 
 
 namespace Clustering {
-    unsigned int __idGenerator = 0;
+
+    unsigned int Cluster::__idGenerator = 0;
 
     LNode::LNode(const Point &p, LNodePtr n)
-            :point(p)
+            :point(p),
+             next(n)
     {
-        Point point = p;
-        LNodePtr next = n;
     }
 
     Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
-            : __p(d), __c(c)
+            : __c(c),
+              __p(d) // I don't think this is the correct value being passed to p but I get an 134 error with 0
     {
-        unsigned int __dimensions = d;  // how many dimensions the centroid point needs to occupy, 2, 3, 50 etc
-        bool __valid = false;
-        const Cluster &__c = c;     // the cluster of points passed to the centroid
+        __dimensions = d;
+        bool __valid = true;  // OR does this need to be true
+ //       compute();        // there is something wrong with this compute function
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
@@ -47,19 +49,58 @@ namespace Clustering {
         __valid = valid;
     }
 
+// This isn't working
     void Cluster::Centroid::compute()
     {
+        if (__c.__points == nullptr)
+        {
+            assert(__c.__size == 0);
+            toInfinity();
+            return;
+        }
 
+        LNodePtr current = __c.__points;
+        Point p(__c.getDimensionality());
+        unsigned int sizeCheck = 0;
+
+        while (current != nullptr)
+        {
+            p += current->point/__c.getSize();
+            current = current->next;
+            sizeCheck++;
+        }
+        assert(sizeCheck == __c.getSize());
+
+        set(p);
     }
 
-    bool Cluster::Centroid::equal(const Point &) const
+    bool Cluster::Centroid::equal(const Point &lhs) const
     {
+        bool answer = true;
+        if (__p.getDims() != lhs.getDims())
+        {
+            throw DimensionalityMismatchEx(__p.getDims(), lhs.getDims());
+        }
+        int size = __p.getDims();
+
+        for (int i=0; i < size; i++)
+        {
+            if (__p[i] != lhs[i])
+            {
+                answer = false;
+            }
+        }
+        return answer;
 
     }
 
     void Cluster::Centroid::toInfinity()
     {
-
+        int size = __p.getDims();
+        for (int i=0; i < size; i++)
+        {
+            __p[i] = std::numeric_limits<double>::max();
+        }
     }
 
     Cluster::Cluster(unsigned int d)
@@ -68,6 +109,7 @@ namespace Clustering {
         __dimensionality = d;
         __size = 0;
         __points = nullptr;
+        __id = __idGenerator++;
     }
     // The big three: cpy ctor, overloaded operator=, dtor
     Cluster::Cluster(const Cluster &rhs)
@@ -85,6 +127,7 @@ namespace Clustering {
             cursor = cursor->next;
             __size++;
         }
+        __id = __idGenerator++;
     }
 
     Cluster &Cluster::operator=(const Cluster &rhs)
@@ -96,7 +139,7 @@ namespace Clustering {
             LNodePtr cursor = __points;
             LNodePtr nextPnt;
 
-            while ( cursor != NULL )
+            while ( cursor != nullptr )
             {
                 nextPnt = cursor->next;
                 delete cursor;
@@ -109,7 +152,7 @@ namespace Clustering {
         for (int i=0; i<rhs.getSize(); i++)
         {
             add(rhsPtr->point);
-            if (rhsPtr->next != NULL)
+            if (rhsPtr->next != nullptr)
                 rhsPtr = rhsPtr->next;
             __size++;
         }
@@ -122,12 +165,12 @@ namespace Clustering {
         LNodePtr cursor = __points;
         LNodePtr nextPnt;
 
-        while (cursor != NULL)
+        while (cursor != nullptr)
         {
             nextPnt = cursor->next;
             delete cursor;
             cursor = nextPnt;
-            if (nextPnt != NULL)
+            if (nextPnt != nullptr)
             {
                 nextPnt = nextPnt->next;
             }
@@ -158,11 +201,12 @@ namespace Clustering {
             cursor = cursor->next;
             __size++;
         }
+        __id = __idGenerator++;
     }
 
     bool Cluster::__in(const Point &p) const
     {
-
+            //NOt sure what this is looking for, is cluster's version of contains?
     }
 
     // Getters/setters
@@ -173,37 +217,48 @@ namespace Clustering {
 
     unsigned int Cluster::getDimensionality() const
     {
-
+        return __dimensionality;
     }
 
     unsigned int Cluster::getId() const
     {
-
+        return __id;
     }
 
 // Set functions: They allow calling c1.add(c2.remove(p));
     void Cluster::add(const Point &p) // TODO add asc order to the requirements
     {
-        LNodePtr newPnt = new LNode(p, NULL);
+        LNodePtr newPnt = new LNode(p, nullptr);
         LNodePtr cursor = __points;
         LNodePtr prev;
         newPnt->point = p;
 
         // Check to see if this will be the first node in the list
-        if (__points == NULL)
+        if (__points == nullptr)
         {
             assert(__size == 0);
+            //cout << endl << newPnt->point << " is being inserted into the head " << endl;
             __points = newPnt;
-            newPnt->next = NULL;
+            newPnt->next = nullptr;
+            __size++;
+            return;
         }
 
-            // Replace the head point if p is smaller
-        else if (__points->point > p)
+        else if (__points->next == nullptr)
         {
-            cursor->point = __points->point;
-            __points->point = p;
-            __points->next = cursor;
-            cursor->next = NULL;
+            if (newPnt->point < __points->point)
+            {
+                //cout << endl << newPnt->point << " is replacing " << __points->point << endl;
+                newPnt->next = __points;
+                __points = newPnt;
+            }
+            else
+            {
+               // cout << endl << newPnt->point << " comes after " << __points->point << endl;
+                __points->next = newPnt;
+            }
+            __size++;
+            return;
         }
 
             // Or add another node to the existing list
@@ -233,6 +288,7 @@ namespace Clustering {
         }
         __size++;
     }
+
 
     const Point &Cluster::remove(const Point &p)
     {
@@ -277,7 +333,7 @@ namespace Clustering {
     bool Cluster::contains(const Point &theWantedOne) const // I'm getting tired of p
     {
         bool answer = false;
-        LNodePtr cursor = __points;
+        LNodePtr cursor;
         if (__dimensionality != theWantedOne.getDims())
             throw DimensionalityMismatchEx(__dimensionality, theWantedOne.getDims());
 
@@ -293,7 +349,7 @@ namespace Clustering {
 
     void Cluster::pickCentroids(unsigned int k, Point **pointArray)
     {
-
+        // I want to pick points far away from each other
     }
 // Overloaded operators
 
@@ -372,7 +428,10 @@ namespace Clustering {
 
     std::istream &operator>>(std::istream &in, Cluster &c)
     {
+        LNodePtr cursor = c.__points;
+        int i=0;
 
+        return in;
     }
 
 // Friends: Comparison
@@ -430,29 +489,36 @@ namespace Clustering {
 // Friends: Arithmetic (Cluster and Point)
     const Cluster operator+(const Cluster &c, const Point &p)
     {
-//        Cluster added;
-//        added.__cpy(c.__points);
-//        added.add(p);
-//        return added;
+        Cluster added(p.getDims());
+        added.__cpy(c.__points);
+        added.add(p);
+        return added;
     }
 
     const Cluster operator-(const Cluster &c, const Point &p)
     {
-//        Cluster subtracted;
-//        subtracted.__cpy(c.__points);
-//        subtracted.remove(p);
-//        return subtracted;
+        Cluster subtracted(p.getDims());
+        subtracted.__cpy(c.__points);
+        subtracted.remove(p);
+        return subtracted;
     }
 
 // Friends: Arithmetic (two Clusters)
     const Cluster operator+(const Cluster &one, const Cluster &two) // union
     {
-//        Cluster allTogether;
-//        allTogether.__cpy(one.__points);
-//        int size = two.getSize();
-//        // This isn't going to work, it will pass the first point and nothing more.
-//        allTogether.add(two.__points->point);
+        // Get the size of the new combined cluster
+        unsigned int newSize = one.__dimensionality + two.__dimensionality;
+        // Make it a new cluster
+        Cluster allTogether(newSize);
+        allTogether.__cpy(one.__points);
 
+        LNodePtr cursor = two.__points;
+        for ( ; cursor != nullptr; cursor = cursor->next)
+        {
+            allTogether.add(two.__points->point);
+        }
+
+        return allTogether;
     }
 
     const Cluster operator-(const Cluster &, const Cluster &) // (asymmetric) difference

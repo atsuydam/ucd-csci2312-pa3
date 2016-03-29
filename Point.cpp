@@ -287,6 +287,11 @@ namespace Clustering {
             {
                 answer = true;
             }
+            if (lhs.__values[i] > rhs.__values[i])
+            {
+                answer = false;
+                return answer;
+            }
 
         }
         return answer;
@@ -298,16 +303,21 @@ namespace Clustering {
     {
         bool answer = false;
         int size = lhs.__dim;
+        cout << size << endl;
         if (size < rhs.__dim || size > rhs.__dim)
             throw DimensionalityMismatchEx(size, rhs.__dim);
         for (int i=0; i < size; i++)
         {
-            if ( lhs.__values[i] > rhs.__values[i])
+            if ( lhs.__values[i] <= rhs.__values[i])
             {
+                cout << endl << lhs.__values[i]  << " is not greater than " << rhs.__values[i] << endl;
+            }
+            else
+            {
+                cout << endl << lhs.__values[i] << " is greater than " << rhs.__values[i];
                 answer = true;
             }
-            if ( lhs.__values[i] < rhs.__values[i])
-                return false;
+
 
         }
         return answer;
