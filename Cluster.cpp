@@ -24,7 +24,7 @@ namespace Clustering {
               __p(d)
     {
         __dimensions = d;
-        __valid = false;  // OR does this need to be true
+        __valid = false;
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
@@ -48,7 +48,6 @@ namespace Clustering {
         __valid = valid;
     }
 
-// This isn't working
     void Cluster::Centroid::compute()
     {
         if (__c.__points == nullptr)
@@ -64,11 +63,11 @@ namespace Clustering {
 
         while (current != nullptr)
         {
-            p += current->point;  ///__c.getSize();
+            p += current->point; //__c.getSize();
             current = current->next;
             sizeCheck++;
         }
-        //assert(sizeCheck == __c.getSize()); //THis was breaking shit
+        assert(sizeCheck == __c.getSize());
         p = p/__c.getSize();
         set(p);
     }
@@ -100,6 +99,7 @@ namespace Clustering {
         {
             __p[i] = std::numeric_limits<double>::max();
         }
+        __valid = true;
     }
 
     Cluster::Cluster(unsigned int d)
@@ -114,15 +114,18 @@ namespace Clustering {
     Cluster::Cluster(const Cluster &rhs)
             : centroid(rhs.__dimensionality, *this)
     {
-        __size = rhs.__size;
-        if (__points != NULL)
-            __del();
-        LNodePtr cursor = rhs.__points;
-        this->__size = 0;
+        __dimensionality = rhs.__dimensionality;
+        __size = 0;
 
-        while (cursor != NULL)
+        if (__points != nullptr)
         {
-            this->add(cursor->point);
+            __del();
+        }
+        LNodePtr cursor = rhs.__points;
+
+        while (cursor != nullptr)
+        {
+            add(cursor->point);
             cursor = cursor->next;
         }
         __id = rhs.__id;
@@ -131,32 +134,32 @@ namespace Clustering {
     Cluster &Cluster::operator=(const Cluster &rhs)
     {
         if (*this == rhs)
+        {
+            __id = rhs.__id;
             return *this;
+        }
         if (this->__dimensionality != rhs.__dimensionality)
             throw DimensionalityMismatchEx(this->__dimensionality, rhs.__dimensionality);
-        else
-        {
-            LNodePtr cursor = __points;
-            LNodePtr nextPnt;
 
-            while ( cursor != nullptr )
-            {
+        LNodePtr cursor = __points;
+        LNodePtr nextPnt;
+
+        while ( cursor != nullptr )
+        {
                 nextPnt = cursor->next;
                 delete cursor;
                 cursor = nextPnt;
                 __size--;
-            }
         }
 
         LNodePtr rhsPtr = rhs.__points;
         for (int i=0; i<rhs.getSize(); i++)
         {
-            add(rhsPtr->point);
+            this->add(rhsPtr->point);
             if (rhsPtr->next != nullptr)
                 rhsPtr = rhsPtr->next;
-            __size++;
         }
-        __id = rhs.__id;
+        this->__id = rhs.__id;
         return *this;
     }
 
@@ -185,7 +188,7 @@ namespace Clustering {
             LNodePtr cursor = __points;
             delete cursor;
         }
-        __points = NULL;
+        __points = nullptr;
         __size = 0;
 
     }
@@ -193,20 +196,19 @@ namespace Clustering {
     void Cluster:: __cpy(LNodePtr pts)
     {
         LNodePtr cursor = pts;
-        this->__size = 0;
+        __size = 0;
 
-        while (cursor != NULL)
+        while (cursor != nullptr)
         {
-            this->add(cursor->point);
+            add(cursor->point);
             cursor = cursor->next;
-            __size++;
         }
         __id = __idGenerator++;
     }
 
     bool Cluster::__in(const Point &p) const
     {
-            //NOt sure what this is looking for, is cluster's version of contains?
+            // Not sure what this is looking for, is it another contains?
     }
 
     // Getters/setters
@@ -237,7 +239,6 @@ namespace Clustering {
         if (__points == nullptr)
         {
             assert(__size == 0);
- //           //cout << endl << newPnt->point << " is being inserted into the head " << endl;
             __points = newPnt;
             newPnt->next = nullptr;
             __size++;
@@ -248,13 +249,11 @@ namespace Clustering {
         {
             if (newPnt->point < __points->point)
             {
-//                //cout << endl << newPnt->point << " is replacing " << __points->point << endl;
                 newPnt->next = __points;
                 __points = newPnt;
             }
             else
             {
- //              // cout << endl << newPnt->point << " comes after " << __points->point << endl;
                 __points->next = newPnt;
             }
             __size++;
@@ -265,16 +264,16 @@ namespace Clustering {
         else
         {
             cursor = __points;
-            prev = NULL;
+            prev = nullptr;
 
-            while (cursor != NULL && cursor->point <= p)
+            while (cursor != nullptr && cursor->point <= p)
             {
                 prev = cursor;
                 cursor = cursor->next;
             }
 
 
-            if (prev == NULL)
+            if (prev == nullptr)
             {
                 __points = newPnt;
                 newPnt->next = cursor;
@@ -287,6 +286,7 @@ namespace Clustering {
             }
         }
         __size++;
+        centroid.setValid(false);
     }
 
 
@@ -311,7 +311,7 @@ namespace Clustering {
         else
         {
             cursor = __points;
-            while (cursor != NULL && cursor->point != p)
+            while (cursor != nullptr && cursor->point != p)
             {
                 prevPtr = cursor;
                 cursor = cursor->next;
@@ -403,9 +403,7 @@ namespace Clustering {
 // Members: Compound assignment (Cluster argument)
     Cluster &Cluster::operator+=(const Cluster &adding) // union
     {
-// You're here and need to compare id's of the points and not add those id's if they are already there
         LNodePtr cursor = adding.__points;
-//        cout << *this << endl;
         for ( ; cursor != nullptr; cursor = cursor->next)
         {
             if (!this->contains(cursor->point))
@@ -413,7 +411,6 @@ namespace Clustering {
                 this->add(cursor->point);
             }
         }
-//        cout << *this << endl;
         return *this;
     }
 
@@ -458,11 +455,13 @@ namespace Clustering {
     {
         bool answer = true;
         if (lhs.__size != rhs.__size)
+        {
             return false;
+        }
 
         LNodePtr Lcursor = lhs.__points;
         LNodePtr Rcursor = rhs.__points;
-        while (Lcursor != NULL)
+        while (Lcursor != nullptr)
         {
             if (Lcursor->point != Rcursor->point )
             {
@@ -474,7 +473,6 @@ namespace Clustering {
                 Lcursor = Lcursor->next;
             }
         }
-
         return answer;
     }
 
@@ -511,10 +509,10 @@ namespace Clustering {
     {
         if (c.__dimensionality != p.getDims())
             throw DimensionalityMismatchEx(c.__dimensionality, p.getDims());
-        Cluster added(p.getDims());
-        added.__cpy(c.__points);
-        added.add(p);
-        return added;
+        Cluster bigC(c.__dimensionality);
+        bigC.__cpy(c.__points);
+        bigC.add(p);
+        return bigC;
     }
 
     const Cluster operator-(const Cluster &c, const Point &p)

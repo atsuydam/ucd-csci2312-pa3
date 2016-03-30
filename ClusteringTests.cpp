@@ -2170,6 +2170,7 @@ void test_cluster_SAO(ErrorContext &ec, unsigned int numRuns) {
             c1.add(p1); c1.add(p2); c1.add(p3);
 
             c2 = c1; c2.add(p4);
+
             Cluster c3 = c1 + p4;
 
             pass = (c3 == c2);
@@ -2631,7 +2632,6 @@ void test_cluster_id(ErrorContext &ec, unsigned int numRuns) {
             Cluster c3 = c1;
 
             pass = (c1.getId() == c2.getId()) && (c1.getId() == c3.getId());
-
             Cluster c4(10);
 
             c4 = c3;
