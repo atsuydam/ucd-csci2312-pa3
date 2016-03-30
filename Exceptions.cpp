@@ -66,38 +66,39 @@ namespace Clustering{
     //Zero Clusters Exceptions
     ZeroClustersEx::ZeroClustersEx()
     {
-
+        __name = "ZeroClustersEx()";
     }
 
     std::string ZeroClustersEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const ZeroClustersEx &ex)
     {
-
+        os << "There are no clusters" << std::endl;
     }
 
     // Data file open exceptions
     DataFileOpenEx::DataFileOpenEx(std::string filename)
     {
-
+        __name = "DataFileOpenEx";
+        __filename = filename;
     }
 
     std::string DataFileOpenEx::getFilename() const
     {
-
+        return __filename;
     }
 
     std::string DataFileOpenEx::getName() const
     {
-
+        return __name;
     }
 
     std::ostream &operator<<(std::ostream &os, const DataFileOpenEx &ex)
     {
-
+        os << ex.__name << ": couldn't open " << ex.__filename << std::endl;
     }
 
     //zero Dimensions Exceptions

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cassert>
 #include <limits>
+#include <bits/algorithmfwd.h>
+#include <sstream>
 #include "Cluster.h"
 #include "Exceptions.h"
 #include "Point.h"
@@ -12,6 +14,7 @@ using namespace std;
 namespace Clustering {
 
     unsigned int Cluster::__idGenerator = 0;
+    const char POINT_CLUSTER_ID_DELIM = ':';
 
     LNode::LNode(const Point &p, LNodePtr n)
             :point(p),
@@ -358,7 +361,18 @@ namespace Clustering {
 
     void Cluster::pickCentroids(unsigned int k, Point **pointArray)
     {
-        // I want to pick points far away from each other
+        if (k == this->getSize())
+        {
+            LNodePtr cursor = this->__points;
+            for (int i = 0; i < k; i++)
+            {
+                while (cursor != nullptr)
+                {
+                    *pointArray[i] = cursor->point;
+                    cursor = cursor->next;
+                }
+            }
+        }
     }
 // Overloaded operators
 
@@ -436,7 +450,7 @@ namespace Clustering {
         int i=0;
         for ( ; i < c.__size; i++)
         {
-            out << cursor->point << " ";
+            out << cursor->point << " : ";
             cursor = cursor->next;
         }
         return out;
@@ -444,9 +458,20 @@ namespace Clustering {
 
     std::istream &operator>>(std::istream &in, Cluster &c)
     {
-        LNodePtr cursor = c.__points;
-        int i=0;
-
+        // horribly stuck and the compiler doesn't like std::count, and CLion won't open the csv files anyway so bugger it
+        string line;
+//        while (getline(in,line)) {
+//            unsigned int d = (unsigned int) std::count(line.begin(),
+//                                     line.end(),
+//            Clustering::POINT_CLUSTER_ID_DELIM);
+//            LNodePtr ptr = new Clustering::LNode(d + 1, nullptr);
+//            std::stringstream lineStream(line);
+//
+//            // call to Point::operator>>
+//            lineStream >> ptr->point;
+//
+//            c.add(ptr->point);
+//        }
         return in;
     }
 

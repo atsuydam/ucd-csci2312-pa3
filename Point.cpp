@@ -262,10 +262,6 @@ namespace Clustering {
                 }
             }
         }
-//        if (lhs.__id != rhs.__id)
-//        {
-//            answer = false;
-//        }
         return answer;
     }
 
