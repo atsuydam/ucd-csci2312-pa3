@@ -112,7 +112,7 @@ namespace Clustering {
     }
     // The big three: cpy ctor, overloaded operator=, dtor
     Cluster::Cluster(const Cluster &rhs)
-            : centroid(__dimensionality, *this)
+            : centroid(rhs.__dimensionality, *this)
     {
         __size = rhs.__size;
         if (__points != NULL)

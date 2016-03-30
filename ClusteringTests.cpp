@@ -2626,7 +2626,9 @@ void test_cluster_id(ErrorContext &ec, unsigned int numRuns) {
         ec.DESC("no id generation on copy and assignment");
 
         {
-            Cluster c1(10), c2(c1), c3 = c1;
+            Cluster c1(10);
+            Cluster c2(c1);
+            Cluster c3 = c1;
 
             pass = (c1.getId() == c2.getId()) && (c1.getId() == c3.getId());
 
