@@ -25,7 +25,7 @@ namespace Clustering {
     }
 
     Point::Point(unsigned int size)
-    // Constructor takin in only the number of dimensions for the point
+    // Constructor taking in only the number of dimensions for the point
     {
         if (size <= 0)
             throw ZeroDimensionsEx();
@@ -40,7 +40,7 @@ namespace Clustering {
 
     Point::Point(unsigned int size, double *p)
     {
-        // Ootional for debugging but I spent too much time trying to debug it
+        // Optional for debugging but I spent too much time trying to debug it
     }
 
 // Big three: cpy ctor, overloaded operator=, dtor
@@ -57,7 +57,7 @@ namespace Clustering {
 
     Point &Point::operator=(const Point &rhs)
     {
-        __id = __idGen++;
+        __id = rhs.__id;
         if (__dim > rhs.__dim)
             throw DimensionalityMismatchEx(__dim, rhs.__dim);
         if (this == &rhs)
@@ -262,13 +262,16 @@ namespace Clustering {
                 }
             }
         }
+//        if (lhs.__id != rhs.__id)
+//        {
+//            answer = false;
+//        }
         return answer;
     }
 
     bool operator!=(const Point &lhs, const Point &rhs)
     {
         bool answer = false;
-        // The next line is causing a break in many of the tests with clustering but works fine in the point tests.
         int dimensions = lhs.getDims();
         if (lhs.__dim != rhs.__dim)
         {
@@ -320,11 +323,11 @@ namespace Clustering {
         {
             if ( lhs.__values[i] <= rhs.__values[i])
             {
-                cout << endl << lhs.__values[i]  << " is not greater than " << rhs.__values[i] << endl;
+//                cout << endl << lhs.__values[i]  << " is not greater than " << rhs.__values[i] << endl;
             }
             else
             {
-                cout << endl << lhs.__values[i] << " is greater than " << rhs.__values[i];
+//                cout << endl << lhs.__values[i] << " is greater than " << rhs.__values[i];
                 answer = true;
             }
 

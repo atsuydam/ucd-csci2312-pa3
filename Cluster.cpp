@@ -21,11 +21,10 @@ namespace Clustering {
 
     Cluster::Centroid::Centroid(unsigned int d, const Cluster &c)
             : __c(c),
-              __p(d) // I don't think this is the correct value being passed to p but I get an 134 error with 0
+              __p(d)
     {
         __dimensions = d;
-        bool __valid = true;  // OR does this need to be true
- //       compute();        // there is something wrong with this compute function
+        __valid = false;  // OR does this need to be true
     }
 
     const Point Cluster::Centroid::get() const // doesn't check for validity
@@ -65,12 +64,12 @@ namespace Clustering {
 
         while (current != nullptr)
         {
-            p += current->point/__c.getSize();
+            p += current->point;  ///__c.getSize();
             current = current->next;
             sizeCheck++;
         }
-        assert(sizeCheck == __c.getSize());
-
+        //assert(sizeCheck == __c.getSize()); //THis was breaking shit
+        p = p/__c.getSize();
         set(p);
     }
 
@@ -126,7 +125,7 @@ namespace Clustering {
             this->add(cursor->point);
             cursor = cursor->next;
         }
-        __id = __idGenerator++;
+        __id = rhs.__id;
     }
 
     Cluster &Cluster::operator=(const Cluster &rhs)
@@ -157,6 +156,7 @@ namespace Clustering {
                 rhsPtr = rhsPtr->next;
             __size++;
         }
+        __id = rhs.__id;
         return *this;
     }
 
@@ -237,7 +237,7 @@ namespace Clustering {
         if (__points == nullptr)
         {
             assert(__size == 0);
-            //cout << endl << newPnt->point << " is being inserted into the head " << endl;
+ //           //cout << endl << newPnt->point << " is being inserted into the head " << endl;
             __points = newPnt;
             newPnt->next = nullptr;
             __size++;
@@ -248,13 +248,13 @@ namespace Clustering {
         {
             if (newPnt->point < __points->point)
             {
-                //cout << endl << newPnt->point << " is replacing " << __points->point << endl;
+//                //cout << endl << newPnt->point << " is replacing " << __points->point << endl;
                 newPnt->next = __points;
                 __points = newPnt;
             }
             else
             {
-               // cout << endl << newPnt->point << " comes after " << __points->point << endl;
+ //              // cout << endl << newPnt->point << " comes after " << __points->point << endl;
                 __points->next = newPnt;
             }
             __size++;
@@ -318,8 +318,11 @@ namespace Clustering {
             }
             if (cursor->point == p)
             {
-                prevPtr->next = cursor->next;
-                delete cursor;
+                if(cursor->point.getId() == p.getId())
+                {
+                    prevPtr->next = cursor->next;
+                    delete cursor;
+                }
             }
             else
             {
@@ -327,6 +330,7 @@ namespace Clustering {
             }
         }
         __size--;
+        centroid.setValid(false);
         return p;
     }
 
@@ -337,10 +341,15 @@ namespace Clustering {
         if (__dimensionality != theWantedOne.getDims())
             throw DimensionalityMismatchEx(__dimensionality, theWantedOne.getDims());
 
-        for (cursor = __points; cursor != NULL; cursor = cursor->next)
+        for (cursor = __points; cursor != nullptr; cursor = cursor->next)
         {
             if (cursor->point == theWantedOne)
-                answer = true;
+            {
+                if (cursor->point.getId() == theWantedOne.getId())
+                {
+                    answer = true;
+                }
+            }
         }
         return answer;
 
@@ -377,40 +386,50 @@ namespace Clustering {
 // Members: Compound assignment (Point argument)
     Cluster &Cluster::operator+=(const Point &more)
     {
-        LNodePtr cursor = __points;
-        cursor->point += more;
-        __size++;
+        if (this->__dimensionality != more.getDims())
+            throw DimensionalityMismatchEx(this->__dimensionality, more.getDims());
+        this->add(more);
+        return *this;
     }
 
     Cluster &Cluster::operator-=(const Point &less)
     {
-        remove(less);
-        __size--;
+        if (this->__dimensionality != less.getDims())
+            throw DimensionalityMismatchEx(this->__dimensionality, less.getDims());
+        this->remove(less);
+        return *this;
     }
 
 // Members: Compound assignment (Cluster argument)
-    Cluster &Cluster::operator+=(const Cluster &second) // union
+    Cluster &Cluster::operator+=(const Cluster &adding) // union
     {
-        LNodePtr cursor = second.__points;
-        for ( ; cursor != NULL; cursor = cursor->next)
+// You're here and need to compare id's of the points and not add those id's if they are already there
+        LNodePtr cursor = adding.__points;
+//        cout << *this << endl;
+        for ( ; cursor != nullptr; cursor = cursor->next)
         {
-            add(cursor->point);
+            if (!this->contains(cursor->point))
+            {
+                this->add(cursor->point);
+            }
         }
+//        cout << *this << endl;
+        return *this;
     }
 
-    Cluster &Cluster::operator-=(const Cluster &c) // (asymmetric) difference
+    Cluster &Cluster::operator-=(const Cluster &takeAway) // (asymmetric) difference
     {
-        LNodePtr cursor = __points;
-        LNodePtr cursorC = c.__points;
-        while (cursor != NULL)
+        if (__points->point.getDims() != takeAway.__points->point.getDims())
+            throw DimensionalityMismatchEx(__points->point.getDims(), takeAway.__points->point.getDims());
+        LNodePtr cursor = takeAway.__points;
+        for ( ; cursor != nullptr; cursor = cursor->next)
         {
-            for ( ; cursorC != NULL; cursorC = cursorC->next)
+            if (this->contains(cursor->point))
             {
-                if (cursorC->point == cursor->point)
-                    remove(cursorC->point);
+                this->remove(cursor->point);
             }
-            cursor = cursor->next;
         }
+        return *this;
     }
 
 // Friends: IO
@@ -455,6 +474,7 @@ namespace Clustering {
                 Lcursor = Lcursor->next;
             }
         }
+
         return answer;
     }
 
@@ -489,6 +509,8 @@ namespace Clustering {
 // Friends: Arithmetic (Cluster and Point)
     const Cluster operator+(const Cluster &c, const Point &p)
     {
+        if (c.__dimensionality != p.getDims())
+            throw DimensionalityMismatchEx(c.__dimensionality, p.getDims());
         Cluster added(p.getDims());
         added.__cpy(c.__points);
         added.add(p);
@@ -497,6 +519,8 @@ namespace Clustering {
 
     const Cluster operator-(const Cluster &c, const Point &p)
     {
+        if (c.__dimensionality != p.getDims())
+            throw DimensionalityMismatchEx(c.__dimensionality, p.getDims());
         Cluster subtracted(p.getDims());
         subtracted.__cpy(c.__points);
         subtracted.remove(p);
@@ -506,23 +530,20 @@ namespace Clustering {
 // Friends: Arithmetic (two Clusters)
     const Cluster operator+(const Cluster &one, const Cluster &two) // union
     {
-        // Get the size of the new combined cluster
-        unsigned int newSize = one.__dimensionality + two.__dimensionality;
-        // Make it a new cluster
-        Cluster allTogether(newSize);
+        Cluster allTogether(one.__dimensionality);
         allTogether.__cpy(one.__points);
-
-        LNodePtr cursor = two.__points;
-        for ( ; cursor != nullptr; cursor = cursor->next)
-        {
-            allTogether.add(two.__points->point);
-        }
+        allTogether += two;
 
         return allTogether;
     }
 
-    const Cluster operator-(const Cluster &, const Cluster &) // (asymmetric) difference
+    const Cluster operator-(const Cluster &one, const Cluster &two) // (asymmetric) difference
     {
+        Cluster takeAway(one.__dimensionality);
+        takeAway.__cpy(one.__points);
+        takeAway -= two;
+
+        return takeAway;
 
     }
 
