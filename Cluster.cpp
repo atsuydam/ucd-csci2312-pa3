@@ -125,7 +125,6 @@ namespace Clustering {
         {
             this->add(cursor->point);
             cursor = cursor->next;
-            __size++;
         }
         __id = __idGenerator++;
     }
@@ -134,6 +133,8 @@ namespace Clustering {
     {
         if (*this == rhs)
             return *this;
+        if (this->__dimensionality != rhs.__dimensionality)
+            throw DimensionalityMismatchEx(this->__dimensionality, rhs.__dimensionality);
         else
         {
             LNodePtr cursor = __points;
@@ -168,7 +169,6 @@ namespace Clustering {
         while (cursor != nullptr)
         {
             nextPnt = cursor->next;
-            delete cursor;
             cursor = nextPnt;
             if (nextPnt != nullptr)
             {
@@ -527,14 +527,16 @@ namespace Clustering {
     }
 
     Cluster::Move::Move(const Point &p, Cluster &from, Cluster &to)
-            : __p(p), __from(from), __to(to)
+            : __p(p),
+              __from(from),
+              __to(to)
     {
-
     }
 
     void Cluster::Move::perform()
     {
-
+        __from.remove(__p);
+        __to.add(__p);
     }
 
 }

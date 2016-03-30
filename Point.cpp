@@ -14,14 +14,18 @@ namespace Clustering {
 
     unsigned int Point::__idGen = 0; // ID generator
 
-    const char Point:: POINT_VALUE_DELIM = ',';
+    const char Point:: POINT_VALUE_DELIM = ',';  // the delimiter for get line in os operator
 
     void Point:: rewindIdGen()
+    // Backs up the id of the point, make sure you're not going negative first
     {
+        if (__idGen == 0)
+            return;
         __idGen--;
     }
 
     Point::Point(unsigned int size)
+    // Constructor takin in only the number of dimensions for the point
     {
         if (size <= 0)
             throw ZeroDimensionsEx();
@@ -36,8 +40,7 @@ namespace Clustering {
 
     Point::Point(unsigned int size, double *p)
     {
-        // __idGen++;
-        // THis was option for debugging.
+        // Ootional for debugging but I spent too much time trying to debug it
     }
 
 // Big three: cpy ctor, overloaded operator=, dtor
@@ -79,16 +82,19 @@ namespace Clustering {
 
 // Accessors & mutators
     int Point::getId() const
+    // self explanatory, returns the id of a point
     {
         return __id;
     }
 
     unsigned int Point::getDims() const
+    // this returns the size, or dimensions of a point
     {
         return __dim;
     }
 
     void Point::setValue(unsigned int i, double num)
+    // this sets a single value in a dynamic array of points
     {
         if (i >= __dim || i < 0)
             throw OutOfBoundsEx(i, __dim);
@@ -96,6 +102,7 @@ namespace Clustering {
     }
 
     double Point::getValue(unsigned int i) const
+    // this retrieves a single value in an array of points
     {
         if (i >= __dim || i < 0)
             throw OutOfBoundsEx(i, __dim);
@@ -104,6 +111,7 @@ namespace Clustering {
 
 // Functions
     double Point::distanceTo(const Point &rhs) const
+    // calculates the distance between two points.
     {
         if (__dim != rhs.__dim)
             throw DimensionalityMismatchEx(__dim, rhs.__dim);
@@ -135,8 +143,9 @@ namespace Clustering {
         int size = __dim;
         for (int i=0; i < size; i++)
         {
-            __values[i] *= num;
+           this-> __values[i] *= num;
         }
+        return *this;
     }
 
     Point &Point::operator/=(double num)
@@ -144,8 +153,9 @@ namespace Clustering {
         int size = __dim;
         for (int i=0; i < size; i++)
         {
-            __values[i] /= num;
+            this->__values[i] /= num;
         }
+        return *this;
     }
 
     const Point Point::operator*(double num) const // prevent (p1 * 2) = p2;

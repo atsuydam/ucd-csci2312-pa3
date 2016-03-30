@@ -1470,7 +1470,7 @@ void test_cluster_copying(ErrorContext &ec, unsigned int numRuns) {
             Cluster c2(c1);
 
             pass = (c1 == c2);
-
+            std::cout << std::endl << c1.getSize() << "  " << c2.getSize() << std::endl;
             ec.result(pass);
         }
 
