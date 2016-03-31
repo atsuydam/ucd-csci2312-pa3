@@ -4,6 +4,7 @@
 #include <limits>
 #include <bits/algorithmfwd.h>
 #include <sstream>
+#include <assert.h>
 #include "Cluster.h"
 #include "Exceptions.h"
 #include "Point.h"
@@ -299,7 +300,7 @@ namespace Clustering {
         LNodePtr prevPtr = __points;
 
         // empty list
-        if (__points == NULL)
+        if (__points == nullptr)
             return p;
 
         // head of list
@@ -329,7 +330,7 @@ namespace Clustering {
             }
             else
             {
-                cout << "That point wasn't found in the linked list" << endl;
+                std::cout << "That point wasn't found in the linked list" << endl;
             }
         }
         __size--;
@@ -386,7 +387,7 @@ namespace Clustering {
         if (index >= __size)
             throw OutOfBoundsEx(index, __size);
 
-        if (cursor != NULL)
+        if (cursor != nullptr)
         {
             for (int i=0; i<index; i++)
             {
@@ -459,9 +460,9 @@ namespace Clustering {
     std::istream &operator>>(std::istream &in, Cluster &c)
     {
         // horribly stuck and the compiler doesn't like std::count, and CLion won't open the csv files anyway so bugger it
-        string line;
+//        string line;
 //        while (getline(in,line)) {
-//            unsigned int d = (unsigned int) std::count(line.begin(),
+//            unsigned int d = (unsigned int)std::count(line.begin(),
 //                                     line.end(),
 //            Clustering::POINT_CLUSTER_ID_DELIM);
 //            LNodePtr ptr = new Clustering::LNode(d + 1, nullptr);
